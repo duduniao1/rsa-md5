@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>加密</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,target-densitydpi = medium-dpi">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-touch-fullscreen" content="YES">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<body>
+<script type="text/javascript" src="./md5.js"></script>
+<script type="text/javascript" src="./jsencrypt.js"></script>
+<script type="text/javascript">
+
+var PUBLICK_KEY = 'MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgH9ZK++fC83DV62txcrJ3miwio4y5GlWy0nDrIl7OqshrJC3BVvfesPWijYhCLS53U0RRPc/TCICegWuKTzGWYTRG3o17n7mGd6XE/Lf61a3HPhHL3GaVQgJrXryNedfS+v7vISXEZzhfjNVAPnlJQBERIG7ERxnCX7kxYSXp8cvAgMBAAE=';
+
+var private_key = 'MIICWAIBAAKBgH9ZK++fC83DV62txcrJ3miwio4y5GlWy0nDrIl7OqshrJC3BVvfesPWijYhCLS53U0RRPc/TCICegWuKTzGWYTRG3o17n7mGd6XE/Lf61a3HPhHL3GaVQgJrXryNedfS+v7vISXEZzhfjNVAPnlJQBERIG7ERxnCX7kxYSXp8cvAgMBAAECf1UQO0jT9A59bROV/4h1Txqe0e4qEGhMkX20NouexJGK7Lm9htbXcClgJPIDHs2ZWTkhT+/XWANfpCInM2RlGWWnCk9+TaIID/2LL+Ct9F8l1F08GO0eW+4LOMeNzdVbFYtyFmUwykMMZqL8GKkM+xp4LdfCPM2a1XPDm4YT7+ECQQDhrZCq8B34zWlLgiFIralxga1XvfH9xH3jv/QqSeyBwiBQUTcrU0Kw6iyrP5yID4vuFGeP1xZ0TJy0mP2y+7ZfAkEAkHVz+NvBvFnmKl5JjoJ3OVQp50RYXUKegQW+gi7EuzqZeRG3TAcIF6H4nK5vG7/j8XX/UIiG7spFmOE+AeyBMQJAL6M9qHerO/vQQDol4HuYCve+qYjU7iZuFIdOeSbFn9Zkj8+0/5ZBu6qS50s0NZxig00XV0ul18LcSVsKIp/zrQJAcF6c1rEC8+OuUbjEWRGNck/QxK/6WJkwuMZiGdwNdmKv7Whlf8NcfR2mSSK7FQfgZPxXnSqGY4t+NdzIIjD5kQJASvx5snutTqbRu/i5PCijtmK69pL5NzdYNfvTjfK3ip+ungUDzPOOpvj8kQ1LE88/wgobjIdl3gH2+nVS7KAidg==';
+
+//测试MD5Key
+var MD5_KEY = 'asdaszxczxcd';
+
+function encryptRsa(publickkey,str){
+    // Encrypt with the public key...
+    var encrypt = new JSEncrypt();
+    encrypt.setPublicKey(publickkey);
+    var encrypted = encrypt.encrypt(str);
+
+    // Decrypt with the private key...
+    var decrypt = new JSEncrypt();
+    decrypt.setPrivateKey(private_key);
+    var uncrypted = decrypt.decrypt(encrypted);
+    
+
+    console.log("加密结果：" + encrypted);
+    console.log("解密结果：" + uncrypted);
+    var data = encrypt.debase64(encrypted);
+
+    var test_str = 'gBYDcRbDvC9G6DJ6+TbxqXe6MBusIUcScC6nsIPmOcCXpKuYQnRx9HI8TKSc006pZMDTP45IWWPjj+k8Sv4I5ICJJ72SpmPsExrM3sEpi/2ULZUM4nSsIeVICrcKRyUzSjc7IlSvmBQgtpjfQH8H7gyjW9kcjiTF1M5pT6tZfBU=';
+    console.log("1转换为16进制" + EnBase64ThreeDes(test_str));
+    console.log("2转换为16进制" + strToHexCharCode(test_str));
+    console.log("3转换为16进制" + str2UTF8(test_str));
+    console.log("4转换为16进制" + encrypt.debase64(test_str));
+    return data;
+}
+
+
+function str2UTF8(str){  
+    var bytes = new Array();   
+    var len,c;  
+    len = str.length;  
+    for(var i = 0; i < len; i++){  
+        c = str.charCodeAt(i);  
+        if(c >= 0x010000 && c <= 0x10FFFF){  
+            bytes.push(((c >> 18) & 0x07) | 0xF0);  
+            bytes.push(((c >> 12) & 0x3F) | 0x80);  
+            bytes.push(((c >> 6) & 0x3F) | 0x80);  
+            bytes.push((c & 0x3F) | 0x80);  
+        }else if(c >= 0x000800 && c <= 0x00FFFF){  
+            bytes.push(((c >> 12) & 0x0F) | 0xE0);  
+            bytes.push(((c >> 6) & 0x3F) | 0x80);  
+            bytes.push((c & 0x3F) | 0x80);  
+        }else if(c >= 0x000080 && c <= 0x0007FF){  
+            bytes.push(((c >> 6) & 0x1F) | 0xC0);  
+            bytes.push((c & 0x3F) | 0x80);  
+        }else{  
+            bytes.push(c & 0xFF);  
+        }  
+    }  
+    var _str = [];
+    for(var j = 0 ;j < bytes.length;j++){
+        _str.push(bytes[j].toString(16));
+    }
+    return _str.join("");  
+}  
+function EnBase64ThreeDes (s) {
+    var r="";
+    var w = new Array();
+    var hexes = new Array ("0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f");
+    for (var i=0; i<s.length; i++)
+    {
+        r += hexes [s.charCodeAt(i) >> 4] + hexes [s.charCodeAt(i) & 0xf];
+    }
+    return r;
+    //s是那串乱码r就是转换后的16进制字符串
+}
+function hexCharCodeToStr(hexCharCodeStr) {  
+    var trimedStr = hexCharCodeStr.trim();  
+    var rawStr = trimedStr.substr(0, 2).toLowerCase() === "0x" ? trimedStr.substr(2) : trimedStr;  
+    var len = rawStr.length;  
+    if (len % 2 !== 0) {  
+        alert("存在非法字符!");  
+        return "";  
+    }  
+    var curCharCode;  
+    var resultStr = [];  
+    for (var i = 0; i < len; i = i + 2) {  
+        curCharCode = parseInt(rawStr.substr(i, 2), 16);  
+        resultStr.push(String.fromCharCode(curCharCode));  
+    }  
+    return resultStr.join("");  
+}  
+// 字符串转16进制
+function strToHexCharCode(str) {
+　　if(str === "")
+　　　　return "";
+　　var hexCharCode = [];
+　　for(var i = 0; i < str.length; i++) {
+　　　　hexCharCode.push((str.charCodeAt(i)).toString(16));
+　　}
+　　return hexCharCode.join("");
+}
+
+var _data = JSON.stringify({sn:'sss',from:'ssss',certType:0,certNo:'310104194811213627',custName:'测试姓名',time:+new Date()});
+
+var data = encryptRsa(PUBLICK_KEY,_data);
+
+var mac = md5('fromsssdata' + data + MD5_KEY);
+
+console.log('MD5加密结果：' + mac);
+
+</script>
+</body>
+</html>
